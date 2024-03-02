@@ -155,7 +155,7 @@ public:
         ofstream file("data_books.txt");
         if (file.is_open()) {
             for (Book book : books) {
-                file <<"Book ID: " <<  book.getBID() << "\nBook title: " << book.getTitle() << "\nBook Author: " << book.getAuthor() << "\nBook Genre" << book.getGenre() << endl;
+                file <<"Book ID: " <<  book.getBID() << "\nBook title: " << book.getTitle() << "\nBook Author: " << book.getAuthor() << "\nBook Genre: " << book.getGenre() << endl;
             }
             file.close();
             cout << "Library data saved to file: data_books.txt" << endl;
@@ -215,6 +215,27 @@ public:
         }
     }
 
+    void loadUserID(int& i) {
+        ifstream file("data_userid");
+        if (file.is_open()) {
+            while (file >> i) {
+                User newUser;
+                newUser.setUID(i);
+                i++;
+            }
+        }
+    }
+
+    void loadBookID(int& i) {
+        ifstream file("data_bookid");
+        if (file.is_open()) {
+            while (file >> i) {
+                Book newBook;
+                newBook.setBID(i);
+             i++;            
+            }
+        }
+    }
 
     vector<User> getUsers() {
         return users;
@@ -222,12 +243,14 @@ public:
 };
 
 int main() {
-    int num;
+    int num, i = 1; // Initialize i with 1
     Library objectLibrary;
     objectLibrary.loadFromFileusers();
     objectLibrary.loadFromFilebooks();
     bool repeatOperation = true;
     while (repeatOperation) {
+        objectLibrary.loadUserID(i); // Pass i as a reference
+        objectLibrary.loadBookID(i); // Pass i as a reference
         cout << "1. Add new Book" << endl;
         cout << "2. Remove Book" << endl;
         cout << "3. Display Books" << endl;
@@ -245,7 +268,7 @@ int main() {
                 Book newBook;
                 string title, author, genre;
 
-                newBook.setBID(time(0));
+                newBook.setBID(i);
                 cin.ignore();
                 cout << "Type the Title of the book: ";
                 getline(cin, title);
@@ -279,7 +302,7 @@ int main() {
                 User newUser;
                 string name;
 
-                newUser.setUID(time(0));
+                newUser.setUID(i);
                 cin.ignore();
                 cout << "Enter your Name: ";
                 getline(cin, name);
