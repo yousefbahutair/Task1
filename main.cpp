@@ -4,6 +4,7 @@
 #include<algorithm>
 #include<fstream>
 using namespace std;
+
 class Book {
     int BID;
     string title, author, genre;
@@ -51,6 +52,7 @@ public:
         cout << "The book is " << (availability ? "Available" : "Not Available")  << endl;
     }
 };
+
 class User {
     int UID;
     vector<Book> booksBorrowed;
@@ -60,53 +62,66 @@ public:
     void setUID(int uid) {
         UID = uid;
     }
-    int getUID() {
-        return UID;
-    }
-    void setName(string Name) {
-        name = Name;
-    }
-    string getName() {
-        return name;
-    }
-    vector<Book> getBooksBorrowed() {
-        return booksBorrowed;
-    }
-    void userInformation() {
-        cout << "User Name: " << name << endl;
-        cout << "User ID Number: " << UID << endl;
-        cout << "Books that are borrowed:" << endl;
-        for (Book singleBook : booksBorrowed) {
-            singleBook.bookInformation();
-        }
-    }
+    
+     int getUID() {
+         return UID; 
+     }
+
+     void setName(string Name) { 
+         name = Name; 
+     }
+
+     string getName() { 
+         return name; 
+     }
+
+     vector<Book> getBooksBorrowed() { 
+         return booksBorrowed; 
+     }
+
+     void userInformation() {
+         cout << "User Name: " << name << endl;
+         cout << "User ID Number: " << UID << endl;
+         cout << "Books that are borrowed:" << endl;
+         for (Book singleBook : booksBorrowed) {
+             singleBook.bookInformation();
+         }
+     }
 };
+
 class Library {
     vector<User> users;
     vector<Book> books;
+
 public:
     void addBook(Book newBook) {
         books.push_back(newBook);
     }
+
     void removeBook(int rmBookID) {
         books.erase(remove_if(books.begin(), books.end(), [rmBookID](Book boo) { return boo.getBID() == rmBookID; }), books.end());
     }
+
     void displayBooks() {
         for (Book book : books) {
             book.bookInformation();
         }
     }
+
     void addUser(User newUser) {
         users.push_back(newUser);
     }
+
     void removeUser(int rmUserID) {
         users.erase(remove_if(users.begin(), users.end(), [rmUserID](User use) { return use.getUID() == rmUserID; }), users.end());
     }
+
     void displayUsers() {
         for (User user : users) {
             user.userInformation();
         }
     }
+
     void borrowBook(User& user, int bookID) {
         for (Book& book : books) {
             if (book.getBID() == bookID && book.getAvailability()) {
@@ -118,6 +133,7 @@ public:
         }
         cout << "Not available." << endl;
     }
+
     void returnBook(User& user, int bookID) {
         for (int i = 0; i < user.getBooksBorrowed().size(); i++) {
             if (user.getBooksBorrowed()[i].getBID() == bookID) {
@@ -134,20 +150,22 @@ public:
         }
         cout << "Not found in user list." << endl;
     }
-    void saveToFile(string fileName) {
-        ofstream file(fileName);
+
+    void saveToFile() {
+        ofstream file("data.txt");
         if (file.is_open()) {
             for (Book book : books) {
                 file << book.getBID() << " " << book.getTitle() << " " << book.getAuthor() << " " << book.getGenre() << " " << book.getAvailability() << endl;
             }
             file.close();
-            cout << "Library data saved to file: " << fileName << endl;
+            cout << "Library data saved to file: data.txt" << endl;
         } else {
             cout << "Unable to open file for saving." << endl;
         }
     }
-    void loadFromFile(string fileName) {
-        ifstream file(fileName);
+
+    void loadFromFile() {
+        ifstream file("data.txt");
         if (file.is_open()) {
             int bid, availability;
             string title, author, genre;
@@ -161,18 +179,21 @@ public:
                 books.push_back(newBook);
             }
             file.close();
-            cout << "Library data loaded from file: " << fileName << endl;
+            cout << "Library data loaded from file: data.txt" << endl;
         } else {
             cout << "Unable to open file for loading." << endl;
         }
     }
+
     vector<User> getUsers() {
         return users;
     }
 };
+
 int main() {
     int num;
     Library objectLibrary;
+    objectLibrary.loadFromFile();
     bool repeatOperation = true;
     while (repeatOperation) {
         cout << "1. Add new Book" << endl;
@@ -183,21 +204,16 @@ int main() {
         cout << "6. Display Users" << endl;
         cout << "7. Borrow Book" << endl;
         cout << "8. Return Book" << endl;
-        cout << "9. Save Library Data to File" << endl;
-        cout << "10. Load Library Data from File" << endl;
-        cout << "11. Exit" << endl;
+        cout << "9. Exit" << endl;
         cout << "Choose one of the numbers here: ";
         cin >> num;
+
         switch (num) {
             case 1: {
                 Book newBook;
-                int bookID;
                 string title, author, genre;
 
-                cout << "Type the Book ID: ";
-                cin >> bookID;
-                newBook.setBID(bookID);
-
+                newBook.setBID(time(0));
                 cin.ignore();
                 cout << "Type the Title of the book: ";
                 getline(cin, title);
@@ -212,6 +228,7 @@ int main() {
                 newBook.setGenre(genre);
 
                 objectLibrary.addBook(newBook);
+                cout << "Book entered successfully." << endl;
                 break;
             }
             case 2: {
@@ -225,21 +242,19 @@ int main() {
             case 3:
                 objectLibrary.displayBooks();
                 break;
+
             case 4: {
                 User newUser;
-                int userID;
                 string name;
 
-                cout << "Type your User ID: ";
-                cin >> userID;
-                newUser.setUID(userID);
-
+                newUser.setUID(time(0));
                 cin.ignore();
                 cout << "Enter your Name: ";
                 getline(cin, name);
                 newUser.setName(name);
 
                 objectLibrary.addUser(newUser);
+                cout << "User entered successfully!" << endl;
                 break;
             }
 
@@ -257,24 +272,25 @@ int main() {
 
             case 7: {
                 int borrowUserID, borrowBookID;
-                
+
                 cout << "Type User ID: ";
                 cin >> borrowUserID;
 
                 User borrowUser;
-                for (User u : objectLibrary.getUsers()) {
+                
+                 for (User u : objectLibrary.getUsers()) {
                     if (u.getUID() == borrowUserID) {
                         borrowUser = u;
                         break;
                     }
-                }
+                 }
 
-                cout << "Type the ID of the Book you want to borrow: ";
-                cin >> borrowBookID;
+                 cout << "Type the ID of the Book you want to borrow: ";
+                 cin >> borrowBookID;
 
-                objectLibrary.borrowBook(borrowUser, borrowBookID);
-                
-                break;
+                 objectLibrary.borrowBook(borrowUser, borrowBookID);
+                 
+                 break;
             }
             case 8: {
                 int returnUserID, returnBookID;
@@ -290,6 +306,7 @@ int main() {
                         break;
                     }
                  }
+
                  cout << "Type a Book ID to return: ";
                  cin >> returnBookID;
 
@@ -297,33 +314,13 @@ int main() {
                  
                  break;
             }
-            case 9: {
-                 string saveFileName;
-
-                 cout << "Type file name to save in library: ";
-                 cin >> saveFileName;
-
-                 objectLibrary.saveToFile(saveFileName);
-                 
-                 break;
-            }
-            case 10: {
-                 string loadFileName;
-
-                 cout << "Type file name to load library data: ";
-                 cin >> loadFileName;
-
-                 objectLibrary.loadFromFile(loadFileName);
-                 
-                 break;
-            }
-            case 11:
+            case 9:
                 repeatOperation = false;
+                objectLibrary.saveToFile();
                 break;
 
             default:
                 cout << "ERROR, Please try again." << endl;
-                break;
         }
     }
 
